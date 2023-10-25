@@ -1,0 +1,192 @@
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE, include=TRUE}
+library(tidyverse)
+library(mice)
+library(Hmisc)
+library(RColorBrewer)
+library(kableExtra)
+library(gtsummary)
+library(psych)
+library(ggcorrplot)
+library(leaps)
+library(dplyr, warn.conflicts = FALSE)
+library(ISLR)
+library(DescTools) 
+library(stats)
+library(Metrics)
+library(smbinning)
+library(ROCR)
+library(Matrix)
+library(glmnet)
+library(caret)
+library(InformationValue)
+library(pkgsearch)
+library(pROC)
+library(plyr)
+library(corrplot)
+library(plotrix)
+library(jtools)
+library(readxl)
+library(knitr)
+library(ggplot2)
+library(gridExtra)
+library(quantmod)
+library(forecast)
+library(MASS)
+```
+
+Part 1
+```{r}
+#Defining the values 
+an_de= 15000
+unit_cost	= 80
+cost_hold = 	18 / 100
+order_cost	= 220
+```
+
+```{r}
+#To Know starting the inventory level Q
+inv_level_Q1 = round(sqrt(((2 * an_de * order_cost) / (unit_cost * cost_hold))),0)
+inv_level_Q1
+
+inv_level_Q2 = 2 * inv_level_Q1 #To Know Order Quantity (2Q)
+inv_level_Q2
+
+order_n = round(an_de / inv_level_Q2,0) #To Obtain total number of order
+order_n
+
+anu_ord_Co	= order_cost * (an_de/inv_level_Q2) #Obtain Annual order Cost
+anu_ord_Co
+
+anu_hd_Co	= (inv_level_Q2/2) * unit_cost * cost_hold #Obtain Annual Holding Cost
+anu_hd_Co
+
+total_cost=	anu_ord_Co + anu_hd_Co #Calculating Total cost 
+total_cost
+
+
+#Creating a random variables for Q and 2Q.
+inventory_level_Q = seq(100, 7500, by = 20)
+order_quantity_2Q = inventory_level_Q * 2
+order_quantity_2Q
+```
+
+```{r}
+#Create a Data frame
+cost_table = data.frame(inventory_level_Q, order_quantity_2Q)
+
+cost_table$total_cost = order_cost * (an_de/order_quantity_2Q) + (unit_cost * cost_hold * inventory_level_Q)
+cost_table$inventory_level_Q[which.min(cost_table$total_cost)]
+```
+
+PART 2
+```{r}
+# Triangular distribution Values
+min_val = 13000
+max_val = 17000
+peak_val = 15000
+```
+
+```{r}
+# 1000 Random Values generation 
+ra = (runif(1000))
+ra = round(ra,2)
+rnd_vals =as.data.frame(ra)
+```
+
+```{r}
+# Triangular Distribution 
+#Triangle Formula
+# m = (c - a) / (b - a)
+# n = (b - a)(c - a)
+# o = (b - a)(b - c)
+
+m = (peak_val - min_val) / (max_val - min_val)
+m
+options(scipen = 999)
+n = (max_val - min_val) * (peak_val - min_val)
+n
+o = (max_val - min_val) * (max_val - peak_val)
+o
+
+#if  r > K,  x = b - sqrt( (1-r) N)	
+#if  r <= K,   x = a + sqrt( rM )		
+
+x = min_val + sqrt(ra*n)
+y = max_val - sqrt((1-ra)*o)
+
+```
+
+```{r}
+# Generating simulation for the decision variables and model parameters
+# Stimulation values for Annual demand 
+
+an_de_sim = ifelse(x <= m, x, y)
+an_de_sim = round(an_de_sim,0)
+round(sd(an_de_sim),0)
+an_de_2 = an_de_sim
+# Stimulation values for Inventory level 1(Q)
+sim_inventory_level_Q = round(sqrt(((2 * an_de_2 * order_cost) / (unit_cost * cost_hold))),0)
+
+# Stimulation values for Order quantity (2Q)
+sim_order_quantity_2Q = 2 *  sim_inventory_level_Q
+
+# Stimulation values for N number of Orders
+sim_Order_N = round(an_de_2 / sim_order_quantity_2Q,0)
+
+# Stimulation values for Annual order Cost
+sim_anl_order_cost	= order_cost * (an_de_2/sim_order_quantity_2Q)
+
+# Stimulation values for Annual Holding Cost
+sim_anl_Hd_Cost	=  sim_inventory_level_Q * unit_cost * cost_hold
+
+# Stimulation values for Annual Total Cost
+sim_anl_total_cost =	sim_anl_order_cost + sim_anl_Hd_Cost
+
+#Making a data from for all generate stimulated values
+sim_table = data.frame(ra, an_de_2,sim_anl_total_cost,sim_order_quantity_2Q,sim_Order_N)
+```
+
+```{r}
+#Performing normal distribution to Annual total Cost
+totalcost_inv = rnorm(n = 1000, m = mean(sim_table$sim_anl_total_cost), sd = sd(sim_table$sim_anl_total_cost))
+
+hi_pl = hist(sim_table$sim_anl_total_cost ,freq = F, ylim = c(0.0000, 0.0020), main = " Annual Total cost Distribution", col = "#25E11B", xlab = " Total Cost", ylab = " Density", breaks = 20) 
+te = ecdf(sim_table$sim_anl_total_cost)
+
+plo = plot(te, main = "Cumulative distribution of Total cost", col = "#25E11B", xlab = "Total Cost", ylab = "Cumulative distribution")
+
+qqnorm(totalcost_inv, main = "Q-Q Plot: Normal distribution of Total cost", col = "#25E11B", pch = 19)  
+shapiro.test(totalcost_inv)
+chisq.test(totalcost_inv)
+
+plot(sim_table$an_de_2, sim_table$sim_anl_total_cost, xlab = "Annual Demand (in units)", 
+     ylab = "Total Cost(in $)", col = "#25E11B", pch = 19,main = "Annual Demand VS Total cost") 
+```
+
+```{r}
+# Performing normal distribution to Order quantity
+order_qty=rnorm(n=1000,m=mean(sim_table$sim_order_quantity_2Q),sd=sd(sim_table$sim_order_quantity_2Q))
+
+hist(sim_table$sim_order_quantity_2Q, freq=F, main = " Order Quantity Distribution", col = "#25E11B", xlab = "Order Quantity (2Q)", ylab = "Density", breaks = 20, ylim = c(0.000, 0.020)) 
+te1 = ecdf(sim_table$sim_order_quantity_2Q)
+plot(te1, main = "Cumulative distribution of Order Quantity", col = "#25E11B", xlab = "Order Quantity", ylab = "Cumulative distribution")
+
+qqnorm(order_qty, col = "#25E11B", main = "Q-Q Plot: Normal distribution of Order Quantity", pch = 19)  
+shapiro.test(order_qty)
+chisq.test(order_qty)
+```
+
+```{r}
+#Performing normal distribution to Annual number of orders
+Order_Number=rnorm(n=1000,m=mean(sim_table$sim_Order_N),sd=sd(sim_table$sim_Order_N))
+
+hist(sim_table$sim_Order_N, freq = F,main = "Order Number Distribution", col              ="#25E11B", xlab=" Order Number ", ylab= " Density",breaks=20, ylim=c(1, 20)) 
+r= ecdf(sim_table$sim_Order_N)
+plot(r,main=" Cumulative distribution of Order Number ", col="#25E11B", xlab=" Order Number", ylab= " Cumulative distribution")
+
+qqnorm(Order_Number, col="#25E11B",main="Q-Q Plot: Normal distribution of Order Number ", pch= 19)  
+shapiro.test(Order_Number)
+chisq.test(Order_Number)
+```
+
