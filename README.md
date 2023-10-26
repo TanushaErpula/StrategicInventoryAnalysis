@@ -1,34 +1,53 @@
 # mod
 
 
-# Precriptive Modeling: Inventory Decision Modeling
+
+# Prescriptive Modeling in Inventory Management
 
 ## Introduction
 
-This project dives into the Business Analytics series of continuous decision modeling. The main aim is to translate data-driven insights into optimal actionable decisions. These decisions are gauged based on their impact on key performance metrics, ultimately leading to enhanced strategic planning.
+In the realm of Business Analytics, continuous decision modeling plays a pivotal role. These models help translate data-driven insights into actionable decisions that positively affect key performance metrics. This, in turn, aids in refined strategic planning. One such vital tool is the evaluation method, which acts as a conceptual framework to understand, coordinate, and integrate the business logic behind strategic decisions.
 
-We focus on creating a decision model for inventory analysis for a specific retail outlet. The core objective is to develop a framework that helps determine the optimal amount to order from inventories, balancing demand with total inventory costs. 
+The focus of this project revolves around building a decision model for a retail outlet's inventory study. Our primary goal is to establish a framework to ascertain the optimal amount to procure from inventories. This ensures a balance between meeting demands and managing total inventory costs.
 
-Inefficient management of device maintenance and inventory can either signal business inefficiency (surplus stock) or lead to business halts (stock shortages). The challenge is deciding the inventory levels to purchase, produce, and maintain to minimize costs. Two primary costs are considered:
+The importance of efficient device maintenance cannot be stressed enough. Holding excess stock can point towards an inefficiency in business operations. On the other hand, inadequate stock levels can lead to operational halts. For optimal operations, a business needs to strike a balance, deciding on the appropriate inventory levels to purchase, produce, and maintain.
+
+Our study will mainly consider two factors:
 - Cost of ordering
 - Holding expenses
 
-## Analysis
+## Key Considerations
 
-The analysis is based on various company data points, such as unit costs, annual demands, carrying cost rates, and order costs. 
+Here are some of the considerations based on which our analysis is founded:
 
-Models are developed in both MS Excel and R. In MS Excel, the modeling work involves the analysis of the one-way and two-way tables, examining different variables affecting total costs. R, on the other hand, is used for creating various graphical representations to better visualize and understand the data.
+- Each unit's cost is $80, with an anticipated annual demand of 15,000 units.
+- Based on the company's financial data, the estimated cost of holding onto stock for an extended period is 18% of the unit cost.
+- The service cost stands at approximately $220 per order.
+- The company's strategy involves ordering double the product amount required to fulfill demand. This is executed when inventory reaches a specific reordering point, pending the supplier's delivery.
 
-### Part 1: 
+## Analysis Procedure
 
-This section primarily involves working with Excel. The models created utilize given company parameters and uncontrollable inputs. Using these, mathematical models are developed to determine inventory prices, holding costs, and order quantities. 
+Our methodology involves leveraging tools like MS Excel and R programming to derive our insights. Initially, the modeling work will be performed in Excel, and subsequently, relevant charts will be developed using both Excel and R.
 
-### Part 2:
+### Key Components of the Analysis:
+- **One-way table**: Here, we will capture the total cost by examining the model's specifics.
+- **Two-way table**: This will help us ascertain the various components influencing the overall cost.
 
-The variables in Part 2 are consistent with Part 1, but there are changes in the annual requirement and the addition of the triangular distribution factor. Multiple distributional statistics are analyzed, with several trials being performed to evaluate different factors like order quantities and total costs. The data sets from these trials are included in a unique CSV file and an RMD file.
+## Part 2 Analysis
+
+This segment has a structure akin to Part 1. However, it distinguishes itself by introducing variations in the annual demand and the incorporation of a triangular distribution factor. These distributional statistics will be pivotal in executing 1000 trials to derive determinant factors like Quantity of Inventory, Number of Orders, and Total Costs.
+
+To validate the distribution's authenticity, statistical tests like the chi-square test and the Shapiro-Wilk test for normality will be employed.
 
 ## Conclusion
 
-Based on the analysis:
-- An optimal inventory order range is identified which minimizes the total costs.
-- Different values of
+Through our analysis:
+- We deduced that procuring stock between 280 and 420 units ensures minimized costs, thus optimizing expenditures.
+- Using a two-way table, with a unit cost of 80 and an order cost of 220, we derived a total cost of 9750.40.
+- By manipulating model variables, we can gauge the total cost under different scenarios, aiding in effective decision-making.
+
+## References
+- [Enterprise data modeling](https://tdan.com/enterprise-data-modeling/17058) - TDAN.com, 2015
+- [Data modeling - understanding tools and techniques involved](https://www.xenonstack.com/insights/data-modelling) - XenonStack
+- [What is data modelling? overview, basic concepts, and types in detail](https://www.simplilearn.com/what-is-data-modeling-article) - Simplilearn.com, 2022
+- [What is Data Modeling?](https://www.techtarget.com/searchdatamanagement/definition/data-modeling) - SearchDataManagement, 2021
